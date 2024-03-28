@@ -55,7 +55,7 @@ class BmbHome extends StatelessWidget {
       ],
     ),
     body: Center(
-      child: Text('Welcome to BMB Channel'),
+      child: Text('Welcome to BMB razvanus'),
     ),
     floatingActionButton: FloatingActionButton(
       tooltip: 'Add',
