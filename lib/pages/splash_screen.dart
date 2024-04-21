@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_demo/login.dart';
+import 'package:flutter_demo/pages/sign_in.dart';
 
 
 class SplashPage extends StatelessWidget {
@@ -10,7 +10,7 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     //Așteaptă 3 secunde înainte de a trece la următoarea pagină
     Timer(Duration(seconds: 3), () {
-      Navigator.pushNamed(context, '/loginPage');
+      Navigator.pushNamed(context, '/authPage');
     });
 
     return Scaffold(
