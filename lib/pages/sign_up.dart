@@ -172,6 +172,39 @@ class SignInPage extends StatelessWidget {
       Navigator.pushNamed(context, '/mapsPage');
     }
   }
+void checkPasswordCriteria(BuildContext context) {
+  String password = passwordController.text.trim();
+
+  RegExp uppercaseRegex = RegExp(r'[A-Z]');
+  RegExp digitRegex = RegExp(r'[0-9]');
+  RegExp specialCharacterRegex = RegExp(r'[!@#\$%^&*(),.?":{}|<>]');
+
+  bool hasUppercase = uppercaseRegex.hasMatch(password);
+  bool hasDigit = digitRegex.hasMatch(password);
+  bool hasSpecialCharacter = specialCharacterRegex.hasMatch(password);
+
+
+  if (hasUppercase && hasDigit && hasSpecialCharacter) {
+    signMeUp(context);
+  } else {
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Eroare'),
+        content: Text('Password must contain at least one uppercase letter, one number, and one special character.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -238,54 +271,10 @@ class SignInPage extends StatelessWidget {
                     padding: const EdgeInsets.all(25),
                     margin: const EdgeInsets.symmetric(horizontal: 25),
                     child: ButtonSignUp(
-                      onTap: () => signMeUp(context),
+                      onTap: () => checkPasswordCriteria(context),
                     ),
                   ),
 
-                  const SizedBox(height: 40),
-
-                  // login with google / meta
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                            'Or continue with',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // google & meta logo buttons
-
-                  const SizedBox(
-                    height: 40,
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SquareLogo(
-                          onTap: () => signUpWithGoogle(context),
-                          imagePath: 'assets/images/google_logo.png'),
-                    ],
-                  ),
                 ],
               ),
             ),

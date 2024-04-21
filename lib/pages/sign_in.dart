@@ -106,7 +106,48 @@ class LoginPage extends StatelessWidget {
     await FirebaseAuth.instance.signInWithCredential(credential);
     Navigator.of(context).pop();
     Navigator.pushNamed(context, '/mapsPage');
+  }
 
+  void resetPassowrd(BuildContext context) async {
+
+    if(emailController.text == "") {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Type your email!'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+    } else {
+      await FirebaseAuth.instance
+      .sendPasswordResetEmail(email: emailController.text.trim());
+
+      showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Check your mail to reset password!'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+    }
   }
   
   @override
@@ -158,10 +199,14 @@ class LoginPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
+                    GestureDetector(
+                      onTap: () => resetPassowrd(context),
+                      child: Text(
                       'Forgot Password?',
                       style: TextStyle(color: Colors.grey[600]),
                       ),
+                    )
+
                   ],
                 ),
               ),
@@ -205,17 +250,29 @@ class LoginPage extends StatelessWidget {
               // google & meta logo buttons
             
               const SizedBox(height: 40,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                 SquareLogo(
-                  onTap: () => signWithGoogle(context),
-                  imagePath: 'assets/images/google_logo.png'),
-            
-              ],
+
+              InkWell(
+              onTap: () {
+                // Adăugați aici acțiunea dorită pentru atunci când utilizatorul apasă pe logo
+                signWithGoogle(context);
+              },
+              child: Ink(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white24),
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.grey[200],
+                  ),
+                  child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    'assets/images/google_logo.png',
+                    height: 50,
+                  ),
+                ),
               ),
+            ),
               
-              const SizedBox(height: 10),
+            const SizedBox(height: 10),
             
               Row( 
                 mainAxisAlignment: MainAxisAlignment.center,
