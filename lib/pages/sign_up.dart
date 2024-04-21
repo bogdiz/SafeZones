@@ -172,39 +172,39 @@ class SignInPage extends StatelessWidget {
       Navigator.pushNamed(context, '/mapsPage');
     }
   }
-void checkPasswordCriteria(BuildContext context) {
-  String password = passwordController.text.trim();
 
-  RegExp uppercaseRegex = RegExp(r'[A-Z]');
-  RegExp digitRegex = RegExp(r'[0-9]');
-  RegExp specialCharacterRegex = RegExp(r'[!@#\$%^&*(),.?":{}|<>]');
+  void checkPasswordCriteria(BuildContext context) {
+    String password = passwordController.text.trim();
 
-  bool hasUppercase = uppercaseRegex.hasMatch(password);
-  bool hasDigit = digitRegex.hasMatch(password);
-  bool hasSpecialCharacter = specialCharacterRegex.hasMatch(password);
+    RegExp uppercaseRegex = RegExp(r'[A-Z]');
+    RegExp digitRegex = RegExp(r'[0-9]');
+    RegExp specialCharacterRegex = RegExp(r'[!@#\$%^&*(),.?":{}|<>]');
 
+    bool hasUppercase = uppercaseRegex.hasMatch(password);
+    bool hasDigit = digitRegex.hasMatch(password);
+    bool hasSpecialCharacter = specialCharacterRegex.hasMatch(password);
 
-  if (hasUppercase && hasDigit && hasSpecialCharacter) {
-    signMeUp(context);
-  } else {
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Eroare'),
-        content: Text('Password must contain at least one uppercase letter, one number, and one special character.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
+    if (hasUppercase && hasDigit && hasSpecialCharacter) {
+      signMeUp(context);
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Eroare'),
+          content: Text(
+              'Password must contain at least one uppercase letter, one number, and one special character.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +274,6 @@ void checkPasswordCriteria(BuildContext context) {
                       onTap: () => checkPasswordCriteria(context),
                     ),
                   ),
-
                 ],
               ),
             ),
