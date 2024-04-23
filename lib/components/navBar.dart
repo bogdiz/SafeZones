@@ -4,26 +4,30 @@ import 'package:flutter_demo/pages/constants.dart';
 import 'package:flutter/material.dart';
 
 void signMeOut(BuildContext context) async {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Center(child: CircularProgressIndicator());
-    },
-  );
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
 
-  await FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signOut();
 
-  Navigator.of(context).pop(); // Ascunde dialogul de progres
-  Navigator.pushNamed(context, '/loginPage');
+    Navigator.of(context).pop(); // Ascunde dialogul de progres
+    Navigator.pushNamed(context, '/loginPage');
 }
 
+
 Future<String> fetchUsername(String userId) async {
-  final response = await http.get(Uri.parse('$baseURL/users/$userId'));
-  if (response.statusCode == 200) {
-    return response.body;
-  } else {
-    throw Exception('Failed to fetch username');
-  }
+  if(userId != null) {
+    final response = await http.get(Uri.parse('$baseURL/users/$userId'));
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to fetch username');
+    }
+  } 
+  return "";
 }
 
 class NavBar extends StatelessWidget {
