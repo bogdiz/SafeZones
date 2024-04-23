@@ -8,6 +8,7 @@ import 'package:flutter_demo/components/button_sign_in.dart';
 import 'package:flutter_demo/components/button_sign_up.dart';
 import 'package:flutter_demo/components/square_logo.dart';
 import 'package:flutter_demo/components/text_field.dart';
+import 'package:flutter_demo/pages/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
@@ -38,22 +39,30 @@ class SignInPage extends StatelessWidget {
 
         // ------------------ retine in baza de date -----------------------------
 
-        final response = await http.post(
-          Uri.parse('http://192.168.1.16:9191/users/add'),
-          headers: <String, String>{
-            'Content-Type':
-                'application/x-www-form-urlencoded', // Use form data
-          },
-          body: {
-            'name': usernameController.text,
-            'email': emailController.text,
-            'id': userCredential.user!.uid,
-          },
+        final response = await http.get(
+          Uri.parse('$baseURL/users/${userCredential.user!.uid}'),
         );
+
         if (response.statusCode == 200) {
-          print('User added successfully');
+          print('User already exists in the database');
         } else {
-          print('Failed to add user');
+          final response = await http.post(
+            Uri.parse('$baseURL/users/add'),
+            headers: <String, String>{
+              'Content-Type':
+                  'application/x-www-form-urlencoded', // Use form data
+            },
+            body: {
+              'name': usernameController.text,
+              'email': emailController.text,
+              'id': userCredential.user!.uid,
+            },
+          );
+          if (response.statusCode == 200) {
+            print('User added successfully');
+          } else {
+            print('Failed to add user');
+          }
         }
 
         // -----------------------------------------------------------------------
