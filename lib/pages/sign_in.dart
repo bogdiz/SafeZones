@@ -34,9 +34,28 @@ class LoginPage extends StatelessWidget {
         password: passwordController.text.trim(),
       );
       await userCredential.user!.reload();
-      if (userCredential.user!.emailVerified) {
-        Navigator.of(context).pop(); // Ascunde dialogul de progres
+      Navigator.of(context).pop();
+      if (userCredential.user!.emailVerified) { // Ascunde dialogul de progres
+        Navigator.of(context).pop();
         Navigator.pushNamed(context, '/mapsPage');
+      } else {
+        showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('You have to verify your email before proceeding!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
       }
     } on FirebaseAuthException catch (e) {
       Navigator.of(context).pop(); // Ascunde dialogul de progres
@@ -106,7 +125,7 @@ class LoginPage extends StatelessWidget {
     );
     final UserCredential userCredential =
         await FirebaseAuth.instance.signInWithCredential(credential);
-
+  
     // ------------------ retine in baza de date -----------------------------
     final response = await http.get(
       Uri.parse('$baseURL/users/${userCredential.user!.uid}'),
@@ -139,7 +158,6 @@ class LoginPage extends StatelessWidget {
       }
     }
     // -----------------------------------------------------------------------
-
     Navigator.of(context).pop();
     Navigator.pushNamed(context, '/mapsPage');
   }

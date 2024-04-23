@@ -4,7 +4,7 @@ import 'package:flutter_demo/pages/sign_in.dart';
 import 'package:flutter_demo/pages/map_page.dart';
 
 class AuthPage extends StatelessWidget {
-  const AuthPage({super.key});
+  const AuthPage({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,14 +12,21 @@ class AuthPage extends StatelessWidget {
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
-          // user logged in
-          if(snapshot.hasData) {
-            return MapPage();
-          } else {
-            return LoginPage();
+            if (snapshot.hasData) {
+              // Utilizatorul este autentificat
+              User? user = snapshot.data;
+              if (user != null && user.emailVerified) {
+                return MapPage();
+              } else {
+                // Adresa de email nu a fost verificată
+                return LoginPage(); 
+              }
+            } else {
+              return LoginPage();
+            }
           }
-        },
-      )
+
+      ),
     );
   }
 }
