@@ -8,6 +8,7 @@ import 'package:flutter_demo/components/button_sign_in.dart';
 import 'package:flutter_demo/components/square_logo.dart';
 import 'package:flutter_demo/components/text_field.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_demo/pages/constants.dart';
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatelessWidget {
@@ -108,7 +109,7 @@ class LoginPage extends StatelessWidget {
 
     // ------------------ retine in baza de date -----------------------------
     final response = await http.get(
-      Uri.parse('http://192.168.1.16:9191/users/${userCredential.user!.uid}'),
+      Uri.parse('$baseURL/users/${userCredential.user!.uid}'),
     );
 
     if (response.statusCode == 200) {
@@ -121,7 +122,7 @@ class LoginPage extends StatelessWidget {
       String? username = email.substring(0, atIndex);
       // User does not exist, add to the database
       final response = await http.post(
-        Uri.parse('http://192.168.1.16:9191/users/add'),
+        Uri.parse('$baseURL/users/add'),
         headers: <String, String>{
           'Content-Type': 'application/x-www-form-urlencoded', // Use form data
         },
