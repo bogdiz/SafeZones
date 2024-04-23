@@ -28,7 +28,7 @@ class _MapPageState extends State<MapPage> {
         ],
       ),
       drawer: NavBar(), // Adăugați bara de navigare în meniu
-      body: SafeArea(
+      body: Material(
         child: GoogleMap(
           initialCameraPosition: CameraPosition(
             target: _pGooglePlex,
