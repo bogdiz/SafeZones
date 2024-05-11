@@ -52,7 +52,7 @@ class NavBar extends StatelessWidget {
                   accountName: Row(
                     children: [
                       Text('Salut,'),
-                      SizedBox(width: 20),
+                      SizedBox(width: 5),
                       Text(username ?? 'NAME'),
                     ],
                   ),
@@ -60,7 +60,7 @@ class NavBar extends StatelessWidget {
                   currentAccountPicture: CircleAvatar(
                     child: ClipOval(
                       child: Image.asset(
-                        'assets/images/passat.png',
+                        'assets/images/eu.jpeg',
                         fit: BoxFit.cover,
                         width: 90,
                         height: 90,
