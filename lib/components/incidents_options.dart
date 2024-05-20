@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class OptionsPage extends StatefulWidget {
   @override
@@ -51,19 +52,30 @@ class _OptionsPageState extends State<OptionsPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              controller: descriptionController,
-              decoration: InputDecoration(
-                hintText: 'Enter description',
-              ),
+            controller: descriptionController,
+            decoration: InputDecoration(
+              hintText: 'Enter description',
             ),
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(30), // Limita de 30 de caractere
+            ],
+          ),
+
           ),
           // Buton pentru confirmare
           ElevatedButton(
             onPressed: () {
               _handleOptionSelected(context);
             },
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white, backgroundColor: Colors.red, // Culorea textului
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20), // Bordura rotunjită
+              ),
+            ),
             child: Text('Confirm'),
           ),
+
         ],
       ),
     );
