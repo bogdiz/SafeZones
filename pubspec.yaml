@@ -42,6 +42,9 @@ dependencies:
   firebase_core: ^2.30.0
   firebase_auth: ^4.19.2
   google_sign_in: ^6.2.1
+  geolocator: ^7.6.2
+  url_launcher: ^6.0.6
+
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +67,7 @@ flutter:
     - assets/images/city_map.png
     - assets/images/google_logo.png
     - 'assets/images/fb_logo.png'
+    - 'assets/images/eu.jpeg'
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

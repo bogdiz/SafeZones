@@ -14,9 +14,9 @@ class AuthPage extends StatelessWidget {
         builder: (context, snapshot) {
             if (snapshot.hasData) {
               // Utilizatorul este autentificat
-              User? user = snapshot.data;
+              User? user = FirebaseAuth.instance.currentUser;
               if (user != null && user.emailVerified) {
-                return MapPage();
+                return LoginPage();
               } else {
                 // Adresa de email nu a fost verificată
                 return LoginPage(); 

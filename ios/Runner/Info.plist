@@ -61,5 +61,17 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Explicația pentru utilizarea locației în aplicație</string>
+
+	<!-- Pentru a accesa locația precisă -->
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Explicația pentru utilizarea locației în aplicație</string>
+
+	<!-- Pentru a accesa locația aproximativă -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Explicația pentru utilizarea locației în aplicație</string>
+
 </dict>
 </plist>
