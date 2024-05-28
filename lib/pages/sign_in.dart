@@ -204,157 +204,122 @@ class LoginPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Timer(Duration(seconds: 3), () {
-    //   Navigator.pushNamed(context, '/mapsPage');
-    // });
-
-    return Scaffold(
-        backgroundColor: Colors.grey[300],
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // ceva logo eventual
-                  SizedBox(height: 200),
-                  // mesaj
-                  Text(
-                    'Welcome back, SafeZoner!',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-
-                  // Username
-                  MyTextField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    obscureText: false,
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Password
-                  MyTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    obscureText: true,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          onTap: () => resetPassowrd(context),
-                          child: Text(
-                            'Forgot Password?',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-
-                  //const SizedBox(height: 15),
-
-                  Container(
-                    padding: const EdgeInsets.all(25),
-                    margin: const EdgeInsets.symmetric(horizontal: 25),
-                    child: ButtonSignIn(
-                      onTap: () => logMeIn(context),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // login with google / meta
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                            'Or continue with',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // google & meta logo buttons
-
-                  const SizedBox(
-                    height: 40,
-                  ),
-
-                  InkWell(
-                    onTap: () {
-                      // Adăugați aici acțiunea dorită pentru atunci când utilizatorul apasă pe logo
-                      signWithGoogle(context);
-                    },
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white24),
-                        borderRadius: BorderRadius.circular(16),
-                        color: Colors.grey[200],
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Image.asset(
-                          'assets/images/google_logo.png',
-                          height: 50,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue, Colors.purple],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 170),
+                MyTextField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  obscureText: false,
+                ),
+                SizedBox(height: 10),
+                MyTextField(
+                  controller: passwordController,
+                  hintText: 'Password',
+                  obscureText: true,
+                ),
+                SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        "Don't have an account?",
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                      const SizedBox(width: 4),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/signInPage');
-                        },
-                        child: const Text(
-                          'Register now',
-                          style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold),
+                      GestureDetector(
+                        onTap: () => resetPassowrd(context),
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(color: Colors.grey[200]),
                         ),
                       )
                     ],
-                  )
-                ],
-              ),
+                  ),
+                ),
+                SizedBox(height: 15),
+                Container(
+                  padding: const EdgeInsets.all(25),
+                  margin: const EdgeInsets.symmetric(horizontal: 25),
+                  child: ButtonSignIn(
+                    onTap: () => logMeIn(context),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          thickness: 0.5,
+                          color: Colors.grey[200],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Text(
+                          'Or continue with',
+                          style: TextStyle(color: Colors.grey[200]),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          thickness: 0.5,
+                          color: Colors.grey[200],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 40),
+                InkWell(
+                  onTap: () {
+                    signWithGoogle(context);
+                  },
+                  child: SquareLogo(),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account?",
+                      style: TextStyle(color: Colors.grey[200]),
+                    ),
+                    SizedBox(width: 4),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/signInPage');
+                      },
+                      child: Text(
+                        'Register now',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  ],
+                )
+              ],
             ),
           ),
-        ));
-  }
+        ),
+      ),
+    ),
+  );
+}
+
 }

@@ -12,28 +12,29 @@ class MyTextField extends StatelessWidget {
     required this.obscureText,
   });
   
-  @override 
+  @override
   Widget build(BuildContext context) {
     return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25.0),
-          child: TextField(
-            controller: controller,
-            obscureText: obscureText,
-            decoration: InputDecoration(
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.grey.shade400),
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              fillColor: Colors.grey.shade200,
-              filled: true,
-              hintText: hintText,
-              hintStyle: TextStyle(color: Colors.grey[500])
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+          border: Border.all(color: Colors.white, width: 2.0), // Ajustăm grosimea aici
+          color: Colors.white.withOpacity(0.1),
+        ),
+        child: TextField(
+          controller: controller,
+          obscureText: obscureText,
+          style: TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: Colors.white),
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0),
           ),
-        );
+        ),
+      ),
+    );
   }
+
 }

@@ -216,77 +216,89 @@ class SignInPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // Timer(Duration(seconds: 3), () {
-    //   Navigator.pushNamed(context, '/mapsPage');
-    // });
-
-    return Scaffold(
-        appBar: AppBar(
-          // Adăugarea unui buton de tip 'back' în stânga sus
-          backgroundColor: Colors.grey[300],
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pop(); // Navigarea înapoi
-            },
-          ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue, Colors.purple],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        backgroundColor: Colors.grey[300],
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // ceva logo eventual
-                  SizedBox(height: 100),
-                  // mesaj
-                  Text(
-                    'Welcome back, SafeZoner!',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-
-                  // mail
-                  MyTextField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    obscureText: false,
-                  ),
-                  const SizedBox(height: 10),
-
-                  // username
-                  MyTextField(
-                    controller: usernameController,
-                    hintText: 'Username',
-                    obscureText: false,
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Password
-                  MyTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    obscureText: true,
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  Container(
-                    padding: const EdgeInsets.all(25),
-                    margin: const EdgeInsets.symmetric(horizontal: 25),
-                    child: ButtonSignUp(
-                      onTap: () => checkPasswordCriteria(context),
-                    ),
-                  ),
-                ],
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Navigarea înapoi
+                },
               ),
             ),
-          ),
-        ));
-  }
-}
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // ceva logo eventual
+                      SizedBox(height: 100),
+                      // mesaj
+                      /*
+                      Text(
+                        'Welcome back, SafeZoner!',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      */
+                      const SizedBox(height: 25),
+
+                      // mail
+                      MyTextField(
+                        controller: emailController,
+                        hintText: 'Email',
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 10),
+
+                      // username
+                      MyTextField(
+                        controller: usernameController,
+                        hintText: 'Username',
+                        obscureText: false,
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Password
+                      MyTextField(
+                        controller: passwordController,
+                        hintText: 'Password',
+                        obscureText: true,
+                      ),
+
+                      const SizedBox(height: 25),
+
+                      Container(
+                        padding: const EdgeInsets.all(25),
+                        margin: const EdgeInsets.symmetric(horizontal: 25),
+                        child: ButtonSignUp(
+                          onTap: () => checkPasswordCriteria(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}}
