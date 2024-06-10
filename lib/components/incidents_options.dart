@@ -8,9 +8,13 @@ class OptionsPage extends StatefulWidget {
 
 class _OptionsPageState extends State<OptionsPage> {
   final List<String> events = [
-    'Assault', 'Harassment', 'Pickpocketing', 
-    'Robbery', 'Suspicious Activity', 
-    'Public Intoxication', 'Stray Animals', 
+    'Assault',
+    'Harassment',
+    'Pickpocketing',
+    'Robbery',
+    'Suspicious Activity',
+    'Public Intoxication',
+    'Stray Animals',
     'Roof Hazard'
   ];
 
@@ -28,7 +32,7 @@ class _OptionsPageState extends State<OptionsPage> {
   String selectedEvent = "";
   String selectedCategory = "";
   TextEditingController descriptionController = TextEditingController();
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +44,8 @@ class _OptionsPageState extends State<OptionsPage> {
           for (String event in events)
             ListTile(
               title: Text(event),
-              tileColor: selectedEvent == event ? Colors.blue.withOpacity(0.3) : null,
+              tileColor:
+                  selectedEvent == event ? Colors.blue.withOpacity(0.3) : null,
               onTap: () {
                 setState(() {
                   selectedEvent = event;
@@ -52,15 +57,15 @@ class _OptionsPageState extends State<OptionsPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-            controller: descriptionController,
-            decoration: InputDecoration(
-              hintText: 'Enter description',
+              controller: descriptionController,
+              decoration: InputDecoration(
+                hintText: 'Enter description',
+              ),
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(
+                    30), // Limita de 30 de caractere
+              ],
             ),
-            inputFormatters: [
-              LengthLimitingTextInputFormatter(30), // Limita de 30 de caractere
-            ],
-          ),
-
           ),
           // Buton pentru confirmare
           ElevatedButton(
@@ -68,27 +73,28 @@ class _OptionsPageState extends State<OptionsPage> {
               _handleOptionSelected(context);
             },
             style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white, backgroundColor: Colors.red, // Culorea textului
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.red, // Culorea textului
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20), // Bordura rotunjită
               ),
             ),
             child: Text('Confirm'),
           ),
-
         ],
       ),
     );
   }
-void _handleOptionSelected(BuildContext context) {
-      // Întoarceți datele către pagina anterioară
-      Navigator.pop(
-        context,
-        {
-          'event': selectedEvent,
-          'category': selectedCategory,
-          'description': descriptionController.text,
-        },
-      );
-    }
+
+  void _handleOptionSelected(BuildContext context) {
+    // Întoarceți datele către pagina anterioară
+    Navigator.pop(
+      context,
+      {
+        'event': selectedEvent,
+        'category': selectedCategory,
+        'description': descriptionController.text,
+      },
+    );
   }
+}
