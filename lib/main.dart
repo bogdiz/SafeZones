@@ -8,29 +8,27 @@ import 'package:flutter_demo/pages/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 void main() async {
-WidgetsFlutterBinding.ensureInitialized();
-await Firebase.initializeApp(
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  @override 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SplashPage(),
       routes: {
-        '/loginPage' : (context) => LoginPage(),
-        '/mapsPage' : (context) => MapPage(),
-        '/authPage' : (context) => AuthPage(),
-        '/signInPage' : (context) => SignInPage()
+        '/loginPage': (context) => LoginPage(),
+        '/mapsPage': (context) => MapPage(),
+        '/authPage': (context) => AuthPage(),
+        '/signInPage': (context) => SignInPage()
       },
     );
   }
 }
-

@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class SquareLogo extends StatelessWidget {
   //final String imagePath;
   //final Function()? onTap;
-  
+
   const SquareLogo({
     Key? key,
     //required this.imagePath,
     //required this.onTap,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Ink(
