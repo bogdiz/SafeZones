@@ -178,6 +178,7 @@ class SignInPage extends StatelessWidget {
 
     User? user = result.user;
     if (result != null) {
+      print('ok');
       Navigator.pushNamed(context, '/mapsPage');
     }
   }
