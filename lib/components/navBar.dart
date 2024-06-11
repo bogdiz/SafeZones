@@ -30,6 +30,33 @@ Future<String> fetchUsername(String userId) async {
   return "";
 }
 
+Future<int> fetchUserLevel(String userId) async {
+  if (userId.isNotEmpty) {
+    final response = await http.get(Uri.parse('$baseURL/users/level/$userId'),
+        headers: {"Content-Type": "application/json"});
+    if (response.statusCode == 200) {
+      return int.parse(response.body); // Parse the integer from response body
+    } else {
+      throw Exception('Failed to fetch user level');
+    }
+  }
+  return 1; // Default to level 1 if not fetched
+}
+
+// Method to fetch user points from the server
+Future<int> fetchUserPoints(String userId) async {
+  if (userId.isNotEmpty) {
+    final response = await http.get(Uri.parse('$baseURL/users/points/$userId'),
+        headers: {"Content-Type": "application/json"});
+    if (response.statusCode == 200) {
+      return int.parse(response.body); // Parse the integer from response body
+    } else {
+      throw Exception('Failed to fetch user points');
+    }
+  }
+  return 0; // Default to 0 points if not fetched
+}
+
 Future<String> x() async {
   return "";
 }
@@ -38,16 +65,33 @@ class NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return Drawer(
+        child: ListTile(
+          leading: Icon(Icons.error),
+          title: Text('Not Logged In'),
+        ),
+      );
+    }
+    var userId = user.uid;
+
     return Drawer(
-      child: FutureBuilder<String>(
-        future: fetchUsername(user!.uid),
+      child: FutureBuilder<List<dynamic>>(
+        future: Future.wait([
+          fetchUsername(userId),
+          fetchUserLevel(userId),
+          fetchUserPoints(userId)
+        ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            final username = snapshot.data;
+            final username = snapshot.data?[0];
+            final userLevel = snapshot.data?[1];
+            final userPoints = snapshot.data?[2];
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -56,7 +100,8 @@ class NavBar extends StatelessWidget {
                     children: [
                       Text('Hello, '),
                       SizedBox(width: 5),
-                      Text(username ?? 'NAME', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(username ?? 'NAME',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   accountEmail: null,
@@ -73,17 +118,28 @@ class NavBar extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.star, color: Colors.yellow),
-                  title: Text('Level 1', style: TextStyle(color: Color.fromARGB(255, 27, 28, 29), fontWeight: FontWeight.bold )),
+                  title: Text('Level $userLevel',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 27, 28, 29),
+                          fontWeight: FontWeight.bold)),
                   onTap: () => null,
                 ),
                 ListTile(
-                  leading: Icon(Icons.filter_center_focus_rounded, color: Colors.green),
-                  title: Text('Reward points: 0/10', style: TextStyle(color: Color.fromARGB(255, 27, 28, 29), fontWeight: FontWeight.bold )),
+                  leading: Icon(Icons.filter_center_focus_rounded,
+                      color: Colors.green),
+                  title: Text(
+                      'Reward points: $userPoints${userLevel == 5 ? "" : "/${userLevel * 10}"}',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 27, 28, 29),
+                          fontWeight: FontWeight.bold)),
                   onTap: () => null,
                 ),
                 Divider(),
                 ListTile(
-                  title: Text('Dark Mode', style: TextStyle(color: Color.fromARGB(255, 27, 28, 29), fontWeight: FontWeight.bold )),
+                  title: Text('Dark Mode',
+                      style: TextStyle(
+                          color: Color.fromARGB(255, 27, 28, 29),
+                          fontWeight: FontWeight.bold)),
                   trailing: Switch(
                     value: false,
                     onChanged: null,
@@ -94,7 +150,10 @@ class NavBar extends StatelessWidget {
                 Spacer(),
                 SafeArea(
                   child: ListTile(
-                    title: Text('Exit', style: TextStyle(color: Color.fromARGB(255, 27, 28, 29), fontWeight: FontWeight.bold )),
+                    title: Text('Exit',
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 27, 28, 29),
+                            fontWeight: FontWeight.bold)),
                     leading: Icon(Icons.exit_to_app, color: Colors.red),
                     onTap: () => signMeOut(context),
                   ),

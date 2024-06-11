@@ -3,22 +3,23 @@ class Point {
   final String userId;
   final String latitude;
   final String longitude;
+  final DateTime timestamp;
   final String description;
   final String category;
   final String event;
   int votes;
-  final DateTime timestamp;
 
-  Point(
-      {required this.id,
-      required this.userId,
-      required this.latitude,
-      required this.longitude,
-      required this.description,
-      required this.category,
-      required this.event,
-      required this.votes,
-      required this.timestamp});
+  Point({
+    required this.id,
+    required this.userId,
+    required this.latitude,
+    required this.longitude,
+    required this.timestamp,
+    required this.description,
+    required this.category,
+    required this.event,
+    required this.votes,
+  });
 
   factory Point.fromJson(Map<String, dynamic> json) {
     return Point(
@@ -28,13 +29,13 @@ class Point {
           json['latitude'] ?? '', // Default value or handle null appropriately
       longitude:
           json['longitude'] ?? '', // Default value or handle null appropriately
+      timestamp: DateTime.parse(json['timestamp']),
       description: json['description'] ??
           '', // Default value or handle null appropriately
       category:
           json['category'] ?? '', // Default value or handle null appropriately
       event: json['event'],
       votes: json['votes'],
-      timestamp: DateTime.parse(json['timestamp']),
     );
   }
 }
