@@ -69,6 +69,7 @@ class _InfoPanelState extends State<InfoPanel> {
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
+        // print(data[_voteCount].toString() + "\n\n\n\n\n");
         setState(() {
           _voteCount = int.parse(response.body);
         });
@@ -89,12 +90,33 @@ class _InfoPanelState extends State<InfoPanel> {
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
+        _incrementRewardPoints();
         _fetchCurrentVotes();
       } else {
-        throw Exception('Failed to increment votes: ${response.body}');
+        throw Exception(
+            'Failed to increment votes and reward points: ${response.body}');
       }
     } catch (e) {
       print('Error incrementing votes: $e');
+    }
+  }
+
+  // Increment reward Points for the User
+  Future<void> _incrementRewardPoints() async {
+    try {
+      final response = await http.put(
+        // Changed from post to put
+        Uri.parse('$baseURL/users/incrementPoints/${widget.point.userId}'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        print('Reward points incremented successfully.');
+        _fetchCurrentVotes(); // Assuming you want to fetch votes again after incrementing reward points
+      } else {
+        throw Exception('Failed to increment reward points: ${response.body}');
+      }
+    } catch (e) {
+      print('Error incrementing reward points: $e');
     }
   }
 
@@ -103,22 +125,19 @@ class _InfoPanelState extends State<InfoPanel> {
     bool isCurrentUserPoint = _currentUserId == widget.point.userId;
 
     return Positioned(
-  bottom: 50,
-  left: 10,
-  right: 10,
-  child: Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16.0),
-    ),
-    child: Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      bottom: 50,
+      left: 10,
+      right: 10,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 widget.point.event,
@@ -128,6 +147,9 @@ class _InfoPanelState extends State<InfoPanel> {
                   color: Colors.black,
                 ),
               ),
+              SizedBox(
+                height: 12,
+              ),
               Text(
                 _formatTimeAgo(widget.point),
                 style: TextStyle(
@@ -135,18 +157,15 @@ class _InfoPanelState extends State<InfoPanel> {
                   color: Colors.grey[800],
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Text(
-            "Description: " + widget.point.description,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[800],
-            ),
-          ),
-          SizedBox(height: 8),
-          
+              SizedBox(height: 3),
+              Text(
+                "Description: " + widget.point.description,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[800],
+                ),
+              ),
+              SizedBox(height: 3),
               Text(
                 "Likes: $_voteCount",
                 style: TextStyle(
@@ -154,52 +173,49 @@ class _InfoPanelState extends State<InfoPanel> {
                   color: Colors.grey[800],
                 ),
               ),
-          SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-            if (!isCurrentUserPoint)
-            ElevatedButton(
-              onPressed: _incrementVotes,
-              child: Text(
-                'Like',
-                style: TextStyle(
-                  color: Colors.white, // Culoare albă
-                  fontWeight: FontWeight.bold, // Text îngroșat
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Culoare verde
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-              ),
-            ),
-              ElevatedButton(
-                onPressed: widget.onClose,
-                child: Text(
-                  'Close',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ), 
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white70,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-              ),
-            ]
-          )
-
-        ],
+              SizedBox(height: 12),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    if (!isCurrentUserPoint)
+                      ElevatedButton(
+                        onPressed: _incrementVotes,
+                        child: Text(
+                          'Like',
+                          style: TextStyle(
+                            color: Colors.white, // Culoare albă
+                            fontWeight: FontWeight.bold, // Text îngroșat
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green, // Culoare verde
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                        ),
+                      ),
+                    ElevatedButton(
+                      onPressed: widget.onClose,
+                      child: Text(
+                        'Close',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white70,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                      ),
+                    ),
+                  ])
+            ],
+          ),
+        ),
       ),
-    ),
-  ),
-);
-
+    );
   }
 }

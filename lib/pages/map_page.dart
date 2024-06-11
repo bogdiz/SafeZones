@@ -14,7 +14,6 @@ import '../components/incidents_options.dart';
 import '../components/navBar.dart';
 import '../pages/constants.dart';
 
-
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
 
@@ -143,15 +142,16 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
           if (_isInfoPanelVisible && _selectedPoint != null)
-          Positioned(
-            top: 100, // Ajustează această valoare pentru a poziționa InfoPanel mai sus sau mai jos
-            left: 20, // Ajustează această valoare pentru a poziționa InfoPanel mai spre stânga sau dreapta
-            right: 20, // Ajustează această valoare pentru a poziționa InfoPanel mai spre stânga sau dreapta
-            child: InfoPanel(
-              point: _selectedPoint!,
-              onClose: _hidePanel,
+            Positioned(
+              top:
+                  100, // Ajustează această valoare pentru a poziționa InfoPanel mai sus sau mai jos
+              //left: 20, // Ajustează această valoare pentru a poziționa InfoPanel mai spre stânga sau dreapta
+              //right: 20, // Ajustează această valoare pentru a poziționa InfoPanel mai spre stânga sau dreapta
+              child: InfoPanel(
+                point: _selectedPoint!,
+                onClose: _hidePanel,
+              ),
             ),
-          ),
         ],
       ),
     );
