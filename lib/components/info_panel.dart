@@ -28,6 +28,8 @@ class InfoPanel extends StatefulWidget {
 class _InfoPanelState extends State<InfoPanel> {
   int _voteCount = 0;
   String? _currentUserId;
+  String? _userName = '';
+  String? _userLevel = '';
 
   @override
   void initState() {
@@ -35,6 +37,8 @@ class _InfoPanelState extends State<InfoPanel> {
     _voteCount = widget.point.votes;
     _fetchCurrentVotes();
     _fetchCurrentUserId();
+    _fetchUserName();
+    _fetchUserLevel();
   }
 
   // Fetch current user ID
@@ -44,6 +48,46 @@ class _InfoPanelState extends State<InfoPanel> {
       setState(() {
         _currentUserId = user.uid;
       });
+    }
+  }
+
+  // Fetch the user's name
+  Future<void> _fetchUserName() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${baseURL}/users/${widget.point.userId}'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          _userName =
+              response.body; // Assuming the response body is just the username
+        });
+      } else {
+        throw Exception('Failed to load user name');
+      }
+    } catch (e) {
+      print('Error fetching user name: $e');
+    }
+  }
+
+// Fetch the user's level
+  Future<void> _fetchUserLevel() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${baseURL}/users/level/${widget.point.userId}'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          _userLevel = response
+              .body; // Assuming the response body is just the user level
+        });
+      } else {
+        throw Exception('Failed to load user level');
+      }
+    } catch (e) {
+      print('Error fetching user level: $e');
     }
   }
 
@@ -140,7 +184,7 @@ class _InfoPanelState extends State<InfoPanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                widget.point.event,
+                "${widget.point.event} - trust factor $_userLevel/5",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
