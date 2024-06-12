@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_demo/components/theme_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_demo/pages/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void signMeOut(BuildContext context) async {
   showDialog(
@@ -62,6 +64,9 @@ Future<String> x() async {
 }
 
 class NavBar extends StatelessWidget {
+  final Function(bool) toggleTheme;
+  NavBar({required this.toggleTheme});
+
   @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
@@ -74,6 +79,9 @@ class NavBar extends StatelessWidget {
       );
     }
     var userId = user.uid;
+    Color textColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
 
     return Drawer(
       child: FutureBuilder<List<dynamic>>(
@@ -86,7 +94,9 @@ class NavBar extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+                child: Text('Error: ${snapshot.error}',
+                    style: TextStyle(color: textColor)));
           } else {
             final username = snapshot.data?[0];
             final userLevel = snapshot.data?[1];
@@ -98,10 +108,11 @@ class NavBar extends StatelessWidget {
                 UserAccountsDrawerHeader(
                   accountName: Row(
                     children: [
-                      Text('Hello, '),
+                      Text('Hello, ', style: TextStyle(color: textColor)),
                       SizedBox(width: 5),
                       Text(username ?? 'NAME',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: textColor)),
                     ],
                   ),
                   accountEmail: null,
@@ -120,8 +131,7 @@ class NavBar extends StatelessWidget {
                   leading: Icon(Icons.star, color: Colors.yellow),
                   title: Text('Level $userLevel',
                       style: TextStyle(
-                          color: Color.fromARGB(255, 27, 28, 29),
-                          fontWeight: FontWeight.bold)),
+                          color: textColor, fontWeight: FontWeight.bold)),
                   onTap: () => null,
                 ),
                 ListTile(
@@ -130,19 +140,22 @@ class NavBar extends StatelessWidget {
                   title: Text(
                       'Reward points: $userPoints${userLevel == 5 ? "" : "/${userLevel * 10}"}',
                       style: TextStyle(
-                          color: Color.fromARGB(255, 27, 28, 29),
-                          fontWeight: FontWeight.bold)),
+                          color: textColor, fontWeight: FontWeight.bold)),
                   onTap: () => null,
                 ),
                 Divider(),
                 ListTile(
                   title: Text('Dark Mode',
                       style: TextStyle(
-                          color: Color.fromARGB(255, 27, 28, 29),
-                          fontWeight: FontWeight.bold)),
+                          color: textColor, fontWeight: FontWeight.bold)),
                   trailing: Switch(
-                    value: false,
-                    onChanged: null,
+                    value: Provider.of<ThemeProvider>(context)
+                            .getTheme()
+                            .brightness ==
+                        Brightness.dark,
+                    onChanged: (bool value) {
+                      toggleTheme(value);
+                    },
                   ),
                   onTap: () => null,
                 ),
@@ -152,8 +165,7 @@ class NavBar extends StatelessWidget {
                   child: ListTile(
                     title: Text('Exit',
                         style: TextStyle(
-                            color: Color.fromARGB(255, 27, 28, 29),
-                            fontWeight: FontWeight.bold)),
+                            color: textColor, fontWeight: FontWeight.bold)),
                     leading: Icon(Icons.exit_to_app, color: Colors.red),
                     onTap: () => signMeOut(context),
                   ),
