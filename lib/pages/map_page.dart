@@ -5,8 +5,10 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_demo/components/theme_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import '../components/info_panel.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,25 +28,30 @@ class _MapPageState extends State<MapPage> {
   Set<Marker> _markers = {};
   Position? _location;
   Timer? _timer;
-  String? _mapStyle;
   final Completer<GoogleMapController> _mapController = Completer();
   late Set<Circle> _circles = {};
   StreamSubscription<Position>? _positionSubscription;
+  String? _darkMapStyle;
+  String? _lightMapStyle;
 
   bool _isInfoPanelVisible = false;
   Point? _selectedPoint;
 
   void _onMarkerTapped(Point point) {
-    setState(() {
+    setStateIfMounted(() {
       _selectedPoint = point;
       _isInfoPanelVisible = true;
     });
   }
 
   void _hidePanel() {
-    setState(() {
+    setStateIfMounted(() {
       _isInfoPanelVisible = false;
     });
+  }
+
+  void setStateIfMounted(f) {
+    if (mounted) setState(f);
   }
 
   void _likePoint() {
@@ -76,7 +83,7 @@ class _MapPageState extends State<MapPage> {
           onTap: () => _onMarkerTapped(point),
         );
       }));
-      setState(() {
+      setStateIfMounted(() {
         _markers = newMarkers;
       });
     } catch (e) {
@@ -99,6 +106,9 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadMapStyles(); // Load your map styles here
+    });
     _fetchMarkers();
     _getCurrentLocation();
     _initLocationStream();
@@ -106,6 +116,8 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _updateCircle([Position? position]) {
+    if (!mounted) return;
+
     LatLng center = position != null
         ? LatLng(position.latitude, position.longitude)
         : LatLng(44.439663, 26.096306); // Default coordinates
@@ -178,36 +190,44 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    void toggleTheme(bool isDark) {
+      Provider.of<ThemeProvider>(context, listen: false).setTheme(
+        isDark ? ThemeData.dark() : ThemeData.light(),
+      );
+      print('Toggling theme to: ${isDark ? 'Dark' : 'Light'}');
+    }
+
     return Scaffold(
       appBar: AppBar(),
-      drawer: NavBar(),
+      drawer: NavBar(toggleTheme: toggleTheme),
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: LatLng(
-                  _location?.latitude ?? 44.439663,
-                  _location?.longitude ??
-                      26.096306), // Default to a placeholder if _location is null
-              zoom: 14,
-            ),
-            circles: _circles,
-            markers: _markers,
-            onMapCreated: (GoogleMapController controller) {
-              _mapController.complete(controller);
-              if (_mapStyle != null) {
-                controller.setMapStyle(_mapStyle);
-              }
-            },
-            onTap: (LatLng position) {
-              if (_isInfoPanelVisible) {
-                _hidePanel();
-              } else {
-                _handleMapTap(position);
-              }
-            },
-            myLocationButtonEnabled: false
-          ),
+              initialCameraPosition: CameraPosition(
+                target: LatLng(
+                    _location?.latitude ?? 44.439663,
+                    _location?.longitude ??
+                        26.096306), // Default to a placeholder if _location is null
+                zoom: 14,
+              ),
+              circles: _circles,
+              markers: _markers,
+              onMapCreated: (GoogleMapController controller) {
+                _mapController.complete(controller);
+              },
+              style:
+                  Provider.of<ThemeProvider>(context).getTheme().brightness ==
+                          Brightness.dark
+                      ? _darkMapStyle
+                      : _lightMapStyle,
+              onTap: (LatLng position) {
+                if (_isInfoPanelVisible) {
+                  _hidePanel();
+                } else {
+                  _handleMapTap(position);
+                }
+              },
+              myLocationButtonEnabled: false),
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -320,7 +340,7 @@ class _MapPageState extends State<MapPage> {
       desiredAccuracy: LocationAccuracy.high,
       distanceFilter: 10, // Update every 10 meters moved
     ).listen((Position position) {
-      setState(() {
+      setStateIfMounted(() {
         _location = position;
         _updateCircle(position);
       });
@@ -332,6 +352,14 @@ class _MapPageState extends State<MapPage> {
   @override
   void dispose() {
     _positionSubscription?.cancel(); // Cancel the position stream
+    _timer?.cancel();
     super.dispose();
+  }
+
+  void loadMapStyles() async {
+    _darkMapStyle = await DefaultAssetBundle.of(context)
+        .loadString('assets/dark_map_style.json');
+    _lightMapStyle = await DefaultAssetBundle.of(context)
+        .loadString('assets/map_style.json');
   }
 }

@@ -166,6 +166,10 @@ class _InfoPanelState extends State<InfoPanel> {
 
   @override
   Widget build(BuildContext context) {
+    Color textColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     bool isCurrentUserPoint = _currentUserId == widget.point.userId;
 
     return Positioned(
@@ -188,7 +192,7 @@ class _InfoPanelState extends State<InfoPanel> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
-                  color: Colors.black,
+                  color: textColor,
                 ),
               ),
               SizedBox(
@@ -198,7 +202,7 @@ class _InfoPanelState extends State<InfoPanel> {
                 _formatTimeAgo(widget.point),
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[800],
+                  color: textColor,
                 ),
               ),
               SizedBox(height: 3),
@@ -206,7 +210,7 @@ class _InfoPanelState extends State<InfoPanel> {
                 "Description: " + widget.point.description,
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[800],
+                  color: textColor,
                 ),
               ),
               SizedBox(height: 3),
@@ -214,7 +218,7 @@ class _InfoPanelState extends State<InfoPanel> {
                 "Likes: $_voteCount",
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[800],
+                  color: textColor,
                 ),
               ),
               SizedBox(height: 12),

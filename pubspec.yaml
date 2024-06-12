@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^6.0.1
 
   google_maps_flutter: ^2.6.0
   shimmer: ^2.0.0
@@ -76,8 +77,10 @@ flutter:
     - assets/images/fb_logo.png
     - assets/images/eu.jpeg
     - assets/map_style.json
+    - assets/dark_map_style.json
     - assets/images/_red.png
     - assets/images/_yellow.png
+    
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
