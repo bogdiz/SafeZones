@@ -1,6 +1,7 @@
 // Import necessary Dart and Flutter packages
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,8 @@ class _MapPageState extends State<MapPage> {
   Timer? _timer;
   String? _mapStyle;
   final Completer<GoogleMapController> _mapController = Completer();
+  late Set<Circle> _circles = {};
+  StreamSubscription<Position>? _positionSubscription;
 
   bool _isInfoPanelVisible = false;
   Point? _selectedPoint;
@@ -98,7 +101,78 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     _fetchMarkers();
     _getCurrentLocation();
+    _initLocationStream();
     _startFetchingMarkers();
+  }
+
+  void _updateCircle([Position? position]) {
+    LatLng center = position != null
+        ? LatLng(position.latitude, position.longitude)
+        : LatLng(44.439663, 26.096306); // Default coordinates
+    _circles.clear();
+    _circles.add(Circle(
+      circleId: CircleId("currentLocationRadius"),
+      center: center,
+      radius: 300,
+      fillColor: Color.fromARGB(255, 165, 165, 165).withOpacity(0.4),
+      strokeWidth: 1,
+      strokeColor: const Color.fromARGB(255, 0, 0, 0),
+    ));
+    if (!_mapController.isCompleted) {
+      _mapController.future.then((controller) {
+        controller.animateCamera(CameraUpdate.newLatLng(center));
+      });
+    }
+  }
+
+  void _handleMapTap(LatLng tappedPoint) {
+    double distance = _calculateDistance(_location!.latitude,
+        _location!.longitude, tappedPoint.latitude, tappedPoint.longitude);
+
+    if (distance <= 300) {
+      Navigator.push(
+              context, MaterialPageRoute(builder: (context) => OptionsPage()))
+          .then((selectedData) async {
+        if (selectedData != null) {
+          String category = selectedData['category'];
+          String description = selectedData['description'];
+          String event = selectedData['event'];
+          try {
+            addPointToUser(tappedPoint.latitude, tappedPoint.longitude,
+                description, category, event);
+            _fetchMarkers();
+          } catch (e) {
+            print("Error: $e");
+          }
+        }
+      });
+    } else {
+      // Optionally handle taps outside the radius
+      print("Tapped location is outside the 300m radius");
+    }
+  }
+
+  double _calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295; // Math.PI / 180
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a)) * 1000; // 2 * R; R = 6371 km; *1000 for meters
+  }
+
+  void _goToCurrentLocation() async {
+    final GoogleMapController controller = await _mapController.future;
+    if (_location != null) {
+      controller.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(_location!.latitude, _location!.longitude),
+          zoom: 14, // Or any other suitable zoom level
+        ),
+      ));
+    } else {
+      print("Current location is not available.");
+    }
   }
 
   @override
@@ -109,8 +183,14 @@ class _MapPageState extends State<MapPage> {
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition:
-                CameraPosition(target: LatLng(44.439663, 26.096306), zoom: 3),
+            initialCameraPosition: CameraPosition(
+              target: LatLng(
+                  _location?.latitude ?? 44.439663,
+                  _location?.longitude ??
+                      26.096306), // Default to a placeholder if _location is null
+              zoom: 14,
+            ),
+            circles: _circles,
             markers: _markers,
             onMapCreated: (GoogleMapController controller) {
               _mapController.complete(controller);
@@ -121,6 +201,8 @@ class _MapPageState extends State<MapPage> {
             onTap: (LatLng position) {
               if (_isInfoPanelVisible) {
                 _hidePanel();
+              } else {
+                _handleMapTap(position);
               }
             },
           ),
@@ -131,22 +213,26 @@ class _MapPageState extends State<MapPage> {
               child: FloatingActionButton(
                 onPressed: () {
                   _onMapTapped();
-                  // Acțiuni când este apăsat butonul
                 },
                 child: Icon(Icons.add),
-                backgroundColor: Colors.blue.shade500, // Culoare buton
+                backgroundColor: Colors.blue.shade700,
                 foregroundColor: Colors.white,
                 elevation: 3,
-                //shape: CircleBorder(),
               ),
+            ),
+          ),
+          Positioned(
+            bottom: 30,
+            left: 10,
+            child: FloatingActionButton(
+              onPressed: _goToCurrentLocation,
+              child: Icon(Icons.my_location),
+              backgroundColor: Colors.blue.shade700,
             ),
           ),
           if (_isInfoPanelVisible && _selectedPoint != null)
             Positioned(
-              top:
-                  100, // Ajustează această valoare pentru a poziționa InfoPanel mai sus sau mai jos
-              //left: 20, // Ajustează această valoare pentru a poziționa InfoPanel mai spre stânga sau dreapta
-              //right: 20, // Ajustează această valoare pentru a poziționa InfoPanel mai spre stânga sau dreapta
+              top: 100,
               child: InfoPanel(
                 point: _selectedPoint!,
                 onClose: _hidePanel,
@@ -186,6 +272,7 @@ class _MapPageState extends State<MapPage> {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       _location = position;
+      _updateCircle(position);
     } catch (e) {
       print("Error: $e");
     }
@@ -222,5 +309,25 @@ class _MapPageState extends State<MapPage> {
     } else {
       throw Exception('Failed to load points');
     }
+  }
+
+  void _initLocationStream() {
+    StreamSubscription<Position> positionStream = Geolocator.getPositionStream(
+      desiredAccuracy: LocationAccuracy.high,
+      distanceFilter: 10, // Update every 10 meters moved
+    ).listen((Position position) {
+      setState(() {
+        _location = position;
+        _updateCircle(position);
+      });
+    }, onError: (e) {
+      print("Error obtaining location: $e");
+    });
+  }
+
+  @override
+  void dispose() {
+    _positionSubscription?.cancel(); // Cancel the position stream
+    super.dispose();
   }
 }
