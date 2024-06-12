@@ -162,12 +162,13 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _goToCurrentLocation() async {
+    _getCurrentLocation();
     final GoogleMapController controller = await _mapController.future;
     if (_location != null) {
       controller.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
           target: LatLng(_location!.latitude, _location!.longitude),
-          zoom: 14, // Or any other suitable zoom level
+          zoom: 14,
         ),
       ));
     } else {
@@ -205,6 +206,7 @@ class _MapPageState extends State<MapPage> {
                 _handleMapTap(position);
               }
             },
+            myLocationButtonEnabled: false
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -231,11 +233,13 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
           if (_isInfoPanelVisible && _selectedPoint != null)
-            Positioned(
-              top: 100,
-              child: InfoPanel(
-                point: _selectedPoint!,
-                onClose: _hidePanel,
+            SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: InfoPanel(
+                  point: _selectedPoint!,
+                  onClose: _hidePanel,
+                ),
               ),
             ),
         ],
@@ -244,7 +248,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _startFetchingMarkers() {
-    _timer = Timer.periodic(Duration(seconds: 30), (timer) => _fetchMarkers());
+    _timer = Timer.periodic(Duration(seconds: 15), (timer) => _fetchMarkers());
   }
 
   void _onMapTapped() async {
