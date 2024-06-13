@@ -24,26 +24,32 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
+
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: themeProvider.getTheme(),
-      home: AuthStateSwitcher(),
-      routes: {
-        '/loginPage': (context) => LoginPage(),
-        '/mapsPage': (context) => MapPage(),
-        '/authPage': (context) => AuthPage(),
-        '/signInPage': (context) => SignInPage()
+    return ChangeNotifierProvider<ThemeProvider>(
+      create: (_) => ThemeProvider(ThemeData.light()), // Set the initial theme
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            theme: themeProvider.getTheme(),
+            home: SplashPage(),
+            routes: {
+            '/loginPage': (context) => LoginPage(),
+            '/mapsPage': (context) => MapPage(),
+            '/authPage': (context) => AuthPage(),
+            '/signInPage': (context) => SignInPage()
       },
+          );
+        },
+      ),
     );
   }
 }
 
+/*
 class AuthStateSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -54,9 +60,10 @@ class AuthStateSwitcher extends StatelessWidget {
           return SplashPage();
         } else {
           print('User is logged in');
-          return MapPage();
+          return AuthPage();
         }
       },
     );
   }
 }
+*/

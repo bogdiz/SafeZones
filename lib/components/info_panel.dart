@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +13,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 import '../components/point.dart';
+import '../pages/map_page.dart';
 
 class InfoPanel extends StatefulWidget {
   final Point point;
   final VoidCallback onClose;
-  // final String timeAgo;
+
 
   InfoPanel({Key? key, required this.point, required this.onClose})
       : super(key: key);
@@ -30,6 +32,7 @@ class _InfoPanelState extends State<InfoPanel> {
   String? _currentUserId;
   String? _userName = '';
   String? _userLevel = '';
+  bool _isLikedByUser = false;
 
   @override
   void initState() {
@@ -39,9 +42,9 @@ class _InfoPanelState extends State<InfoPanel> {
     _fetchCurrentUserId();
     _fetchUserName();
     _fetchUserLevel();
+    _pointLikedByUser();
   }
 
-  // Fetch current user ID
   Future<void> _fetchCurrentUserId() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -50,8 +53,7 @@ class _InfoPanelState extends State<InfoPanel> {
       });
     }
   }
-
-  // Fetch the user's name
+  
   Future<void> _fetchUserName() async {
     try {
       final response = await http.get(
@@ -61,7 +63,7 @@ class _InfoPanelState extends State<InfoPanel> {
       if (response.statusCode == 200) {
         setState(() {
           _userName =
-              response.body; // Assuming the response body is just the username
+              response.body; 
         });
       } else {
         throw Exception('Failed to load user name');
@@ -71,7 +73,6 @@ class _InfoPanelState extends State<InfoPanel> {
     }
   }
 
-// Fetch the user's level
   Future<void> _fetchUserLevel() async {
     try {
       final response = await http.get(
@@ -105,7 +106,6 @@ class _InfoPanelState extends State<InfoPanel> {
     }
   }
 
-  // Fetch current votes for the point
   Future<void> _fetchCurrentVotes() async {
     try {
       final response = await http.get(
@@ -127,6 +127,7 @@ class _InfoPanelState extends State<InfoPanel> {
 
   // Increment votes for the point
   Future<void> _incrementVotes() async {
+    _isLikedByUser = true;
     try {
       final response = await http.post(
         Uri.parse(
@@ -149,7 +150,6 @@ class _InfoPanelState extends State<InfoPanel> {
   Future<void> _incrementRewardPoints() async {
     try {
       final response = await http.put(
-        // Changed from post to put
         Uri.parse('$baseURL/users/incrementPoints/${widget.point.userId}'),
         headers: {'Content-Type': 'application/json'},
       );
@@ -161,6 +161,34 @@ class _InfoPanelState extends State<InfoPanel> {
       }
     } catch (e) {
       print('Error incrementing reward points: $e');
+    }
+  }
+
+  Future<void> _pointLikedByUser() async {
+  
+    try {
+      final response = await http.get(
+        Uri.parse('$baseURL/points/liked-by/${widget.point.id}/${_currentUserId}'),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        print(response.body);
+        _isLikedByUser = response.body == 'true' ? true : false;
+      }
+    } catch( e) {
+      print(e.toString());
+    }
+  }
+
+  Future<List<Point>> _getMarkersFromBackend() async {
+    final response = await http.get(Uri.parse('${baseURL}/points/all'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = json.decode(response.body);
+      return jsonResponse
+          .map((pointJson) => Point.fromJson(pointJson))
+          .toList();
+    } else {
+      throw Exception('Failed to load points');
     }
   }
 
@@ -225,23 +253,30 @@ class _InfoPanelState extends State<InfoPanel> {
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    if (!isCurrentUserPoint)
-                      ElevatedButton(
-                        onPressed: _incrementVotes,
-                        child: Text(
-                          'Like',
-                          style: TextStyle(
-                            color: Colors.white, // Culoare albă
-                            fontWeight: FontWeight.bold, // Text îngroșat
+                    Visibility(
+                      visible: !isCurrentUserPoint, // Schimbă la true pentru a face butonul vizibil
+                      child: AbsorbPointer(
+                        absorbing: isCurrentUserPoint, // Impiedică interacțiunea utilizatorului
+                        child: ElevatedButton(
+                          onPressed: _incrementVotes,
+                          child: Text(
+                            _isLikedByUser ? 'Liked' : 'Like',
+                            style: TextStyle(
+                              color: Colors.white, // Culoare albă
+                              fontWeight: FontWeight.bold, // Text îngroșat
+                            ),
                           ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green, // Culoare verde
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: 
+                             _isLikedByUser ? Colors.green : Colors.grey, // Culoare verde
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
                           ),
                         ),
                       ),
+                    ),
+
                     ElevatedButton(
                       onPressed: widget.onClose,
                       child: Text(
