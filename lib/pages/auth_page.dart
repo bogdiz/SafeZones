@@ -16,14 +16,11 @@ class AuthPage extends StatelessWidget {
               // Utilizatorul este autentificat
               User? user = FirebaseAuth.instance.currentUser;
               if (user != null && user.emailVerified) {
-                return LoginPage();
-              } else {
-                // Adresa de email nu a fost verificată
-                return LoginPage(); 
-              }
-            } else {
-              return LoginPage();
+                print(user.uid);
+                return MapPage();
+              } 
             }
+            return LoginPage();
           }
 
       ),

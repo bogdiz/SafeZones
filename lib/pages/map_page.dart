@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_demo/components/theme_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -33,6 +34,7 @@ class _MapPageState extends State<MapPage> {
   StreamSubscription<Position>? _positionSubscription;
   String? _darkMapStyle;
   String? _lightMapStyle;
+  late List<Point> nearbyPoints = [];
 
   bool _isInfoPanelVisible = false;
   Point? _selectedPoint;
@@ -52,10 +54,6 @@ class _MapPageState extends State<MapPage> {
 
   void setStateIfMounted(f) {
     if (mounted) setState(f);
-  }
-
-  void _likePoint() {
-    print("Liked ${_selectedPoint?.description}");
   }
 
   Future<void> _fetchMarkers() async {
@@ -113,6 +111,7 @@ class _MapPageState extends State<MapPage> {
     _getCurrentLocation();
     _initLocationStream();
     _startFetchingMarkers();
+    _getNearbyPoints();
   }
 
   void _updateCircle([Position? position]) {
@@ -199,7 +198,7 @@ class _MapPageState extends State<MapPage> {
 
     return Scaffold(
       appBar: AppBar(),
-      drawer: NavBar(toggleTheme: toggleTheme),
+      drawer: NavBar(toggleTheme: toggleTheme, nearbyPoints: nearbyPoints),
       body: Stack(
         children: [
           GoogleMap(
@@ -227,7 +226,23 @@ class _MapPageState extends State<MapPage> {
                   _handleMapTap(position);
                 }
               },
+              myLocationEnabled: true,
               myLocationButtonEnabled: false),
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: EdgeInsets.only(top: 16.0, right: 16.0), // Ajustează valorile pentru padding după preferință
+              child: FloatingActionButton(
+                onPressed: _goToCurrentLocation,
+                child: Icon(
+                  Icons.my_location,
+                  color: Colors.white,
+                ),
+                backgroundColor: Color.fromARGB(255, 125, 136, 136),
+              ),
+            ),
+          ),
+
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -243,15 +258,7 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 30,
-            left: 10,
-            child: FloatingActionButton(
-              onPressed: _goToCurrentLocation,
-              child: Icon(Icons.my_location),
-              backgroundColor: Colors.blue.shade700,
-            ),
-          ),
+        
           if (_isInfoPanelVisible && _selectedPoint != null)
             SafeArea(
               child: Align(
@@ -268,7 +275,11 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _startFetchingMarkers() {
-    _timer = Timer.periodic(Duration(seconds: 15), (timer) => _fetchMarkers());
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _fetchMarkers();
+    _getNearbyPoints();
+    }
+    );
   }
 
   void _onMapTapped() async {
@@ -335,6 +346,23 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  Future<List<Point>> _getNearbyPoints() async {
+  try {
+    List<Point> points = await _getMarkersFromBackend();
+    nearbyPoints.clear();
+    for (Point p in points) {
+      double latitude = double.parse(p.latitude);
+      double longitude = double.parse(p.longitude);
+      if (_calculateDistance(latitude, longitude, _location?.latitude, _location?.longitude) <= 1000) {
+        nearbyPoints.add(p);
+      }
+    }
+    print(nearbyPoints.length);
+  } catch (e) {
+    print(e.toString());
+  }
+  return nearbyPoints;
+}
   void _initLocationStream() {
     StreamSubscription<Position> positionStream = Geolocator.getPositionStream(
       desiredAccuracy: LocationAccuracy.high,
