@@ -34,7 +34,7 @@ class LoginPage extends StatelessWidget {
         password: passwordController.text.trim(),
       );
       await userCredential.user!.reload();
-      Navigator.of(context).pop();
+      // Navigator.of(context).pop();
       if (userCredential.user!.emailVerified) { // Ascunde dialogul de progres
         Navigator.of(context).pop();
         Navigator.pushNamed(context, '/mapsPage');

@@ -10,6 +10,9 @@ import 'package:flutter_demo/components/theme_provider.dart';
 import 'package:flutter_demo/pages/constants.dart';
 import 'package:provider/provider.dart';
 
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 class NavBar extends StatefulWidget {
   final Function(bool) toggleTheme;
   final List<Point> nearbyPoints;
@@ -29,6 +32,9 @@ class _NavBarState extends State<NavBar> {
   double _userLongitude = 0.0;
   bool _isLoading = true;
   String? _errorMessage;
+  File? _profileImage;
+  late String userId;
+  //late pickedFile;
 
   @override
   void initState() {
@@ -41,16 +47,19 @@ class _NavBarState extends State<NavBar> {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        var userId = user.uid;
+        userId = user.uid;
         var userData = await Future.wait([
           fetchUsername(userId),
           fetchUserLevel(userId),
           fetchUserPoints(userId),
+          fetchProfileImage()
+
         ]);
         setState(() {
           _username = userData[0].toString();
           _userLevel = int.parse(userData[1].toString());
           _userPoints = int.parse(userData[2].toString());
+          _profileImage = File(userData[3].toString());
           _isLoading = false;
         });
       }
@@ -60,6 +69,45 @@ class _NavBarState extends State<NavBar> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+      print(pickedFile.path);
+      _uploadProfileImage(pickedFile.path);
+    }
+  }
+
+  Future<void> _uploadProfileImage(String path) async {
+    try {
+      final response = await http.post(
+            Uri.parse('$baseURL/users/update-profile-image/$userId'),
+            headers: <String, String>{
+              'Content-Type':
+                  'application/x-www-form-urlencoded', // Use form data
+            },
+            body: {
+              'imagePath': path
+            },
+          );
+    } catch (e) {
+      print('Failed to upload profile image: $e');
+    }
+  }
+  Future<String> fetchProfileImage() async {
+    final response = await http.get(
+      Uri.parse('$baseURL/users/get-profile-image/$userId'),
+    );
+    if (response.statusCode == 200) {
+      return response.body;
+    }
+    return "";
   }
 
   Future<String> fetchUsername(String userId) async {
@@ -151,8 +199,14 @@ class _NavBarState extends State<NavBar> {
               ],
             ),
             accountEmail: null,
-            currentAccountPicture: CircleAvatar(
-              backgroundImage: AssetImage('assets/images/eu.jpeg'),
+            currentAccountPicture: GestureDetector(
+              onTap: _pickImage,
+              child: CircleAvatar(
+                backgroundImage: _profileImage != null
+                    ? FileImage(_profileImage!)
+                    : NetworkImage(FirebaseAuth.instance.currentUser?.photoURL ??
+                        'https://via.placeholder.com/150') as ImageProvider,
+              ),
             ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
