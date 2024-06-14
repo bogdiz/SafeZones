@@ -46,6 +46,7 @@ dependencies:
   geolocator: ^7.6.2
   url_launcher: ^6.0.6
   location: ^6.0.2
+  image_picker: ^0.8.4+3
 
 fonts:
   - family: RobotoMono

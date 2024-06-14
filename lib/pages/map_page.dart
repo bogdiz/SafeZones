@@ -193,9 +193,7 @@ class _MapPageState extends State<MapPage> {
       Provider.of<ThemeProvider>(context, listen: false).setTheme(
         isDark ? ThemeData.dark() : ThemeData.light(),
       );
-      print('Toggling theme to: ${isDark ? 'Dark' : 'Light'}');
     }
-
     return Scaffold(
       appBar: AppBar(),
       drawer: NavBar(toggleTheme: toggleTheme, nearbyPoints: nearbyPoints),
@@ -274,8 +272,10 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
+
   void _startFetchingMarkers() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _getCurrentLocation();
     _fetchMarkers();
     _getNearbyPoints();
     }
@@ -347,17 +347,18 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<List<Point>> _getNearbyPoints() async {
+  String userId = FirebaseAuth.instance.currentUser!.uid;
   try {
     List<Point> points = await _getMarkersFromBackend();
     nearbyPoints.clear();
     for (Point p in points) {
       double latitude = double.parse(p.latitude);
       double longitude = double.parse(p.longitude);
-      if (_calculateDistance(latitude, longitude, _location?.latitude, _location?.longitude) <= 1000) {
+      if (_calculateDistance(latitude, longitude, _location?.latitude, _location?.longitude) <= 1000 &&
+        p.userId != userId) {
         nearbyPoints.add(p);
       }
     }
-    print(nearbyPoints.length);
   } catch (e) {
     print(e.toString());
   }

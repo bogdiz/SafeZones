@@ -14,11 +14,11 @@ import 'package:http/http.dart' as http;
 
 import '../components/point.dart';
 import '../pages/map_page.dart';
+import 'trust_factor.dart';
 
 class InfoPanel extends StatefulWidget {
   final Point point;
   final VoidCallback onClose;
-
 
   InfoPanel({Key? key, required this.point, required this.onClose})
       : super(key: key);
@@ -53,7 +53,7 @@ class _InfoPanelState extends State<InfoPanel> {
       });
     }
   }
-  
+
   Future<void> _fetchUserName() async {
     try {
       final response = await http.get(
@@ -62,8 +62,7 @@ class _InfoPanelState extends State<InfoPanel> {
       );
       if (response.statusCode == 200) {
         setState(() {
-          _userName =
-              response.body; 
+          _userName = response.body;
         });
       } else {
         throw Exception('Failed to load user name');
@@ -81,8 +80,7 @@ class _InfoPanelState extends State<InfoPanel> {
       );
       if (response.statusCode == 200) {
         setState(() {
-          _userLevel = response
-              .body; // Assuming the response body is just the user level
+          _userLevel = response.body;
         });
       } else {
         throw Exception('Failed to load user level');
@@ -113,7 +111,6 @@ class _InfoPanelState extends State<InfoPanel> {
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
-        // print(data[_voteCount].toString() + "\n\n\n\n\n");
         setState(() {
           _voteCount = int.parse(response.body);
         });
@@ -125,7 +122,6 @@ class _InfoPanelState extends State<InfoPanel> {
     }
   }
 
-  // Increment votes for the point
   Future<void> _incrementVotes() async {
     _isLikedByUser = true;
     try {
@@ -146,7 +142,6 @@ class _InfoPanelState extends State<InfoPanel> {
     }
   }
 
-  // Increment reward Points for the User
   Future<void> _incrementRewardPoints() async {
     try {
       final response = await http.put(
@@ -155,7 +150,7 @@ class _InfoPanelState extends State<InfoPanel> {
       );
       if (response.statusCode == 200) {
         print('Reward points incremented successfully.');
-        _fetchCurrentVotes(); // Assuming you want to fetch votes again after incrementing reward points
+        _fetchCurrentVotes();
       } else {
         throw Exception('Failed to increment reward points: ${response.body}');
       }
@@ -165,7 +160,6 @@ class _InfoPanelState extends State<InfoPanel> {
   }
 
   Future<void> _pointLikedByUser() async {
-  
     try {
       final response = await http.get(
         Uri.parse('$baseURL/points/liked-by/${widget.point.id}/${_currentUserId}'),
@@ -175,7 +169,7 @@ class _InfoPanelState extends State<InfoPanel> {
         print(response.body);
         _isLikedByUser = response.body == 'true' ? true : false;
       }
-    } catch( e) {
+    } catch (e) {
       print(e.toString());
     }
   }
@@ -184,121 +178,127 @@ class _InfoPanelState extends State<InfoPanel> {
     final response = await http.get(Uri.parse('${baseURL}/points/all'));
     if (response.statusCode == 200) {
       List<dynamic> jsonResponse = json.decode(response.body);
-      return jsonResponse
-          .map((pointJson) => Point.fromJson(pointJson))
-          .toList();
+      return jsonResponse.map((pointJson) => Point.fromJson(pointJson)).toList();
     } else {
       throw Exception('Failed to load points');
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    Color textColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+Widget build(BuildContext context) {
+  Color textColor = Theme.of(context).brightness == Brightness.dark
+      ? Colors.white
+      : Colors.black;
 
-    bool isCurrentUserPoint = _currentUserId == widget.point.userId;
+  bool isCurrentUserPoint = _currentUserId == widget.point.userId;
 
-    return Positioned(
-      bottom: 50,
-      left: 10,
-      right: 10,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                "${widget.point.event} - trust factor $_userLevel/5",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: textColor,
+  return SingleChildScrollView(
+    child: Card(
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            if (_userLevel != '')
+              ModernTrustFactor(
+                event: widget.point.event,
+                userLevel: _userLevel!,
+              ),
+            SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(Icons.access_time, color: textColor),
+                SizedBox(width: 8),
+                Text(
+                  _formatTimeAgo(widget.point),
+                  style: TextStyle(fontSize: 16, color: textColor),
                 ),
-              ),
-              SizedBox(
-                height: 12,
-              ),
-              Text(
-                _formatTimeAgo(widget.point),
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
+              ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.description, color: textColor),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    "Description: ${widget.point.description}",
+                    style: TextStyle(fontSize: 16, color: textColor),
+                  ),
                 ),
-              ),
-              SizedBox(height: 3),
-              Text(
-                "Description: " + widget.point.description,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
+              ],
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.thumb_up, color: textColor),
+                SizedBox(width: 8),
+                Text(
+                  "Likes: " + _voteCount.toString(),
+                  style: TextStyle(fontSize: 16, color: textColor),
                 ),
-              ),
-              SizedBox(height: 3),
-              Text(
-                "Likes: $_voteCount",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: textColor,
-                ),
-              ),
-              SizedBox(height: 12),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Visibility(
-                      visible: !isCurrentUserPoint, // Schimbă la true pentru a face butonul vizibil
-                      child: AbsorbPointer(
-                        absorbing: isCurrentUserPoint, // Impiedică interacțiunea utilizatorului
-                        child: ElevatedButton(
-                          onPressed: _incrementVotes,
-                          child: Text(
-                            _isLikedByUser ? 'Liked' : 'Like',
-                            style: TextStyle(
-                              color: Colors.white, // Culoare albă
-                              fontWeight: FontWeight.bold, // Text îngroșat
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: 
-                             _isLikedByUser ? Colors.green : Colors.grey, // Culoare verde
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                          ),
-                        ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Visibility(
+                  visible: !isCurrentUserPoint,
+                  child: AbsorbPointer(
+                    absorbing: isCurrentUserPoint,
+                    child: ElevatedButton.icon(
+                      onPressed: _incrementVotes,
+                      icon: Icon(
+                        _isLikedByUser ? Icons.thumb_up : Icons.thumb_up_off_alt,
+                        color: Colors.white,
                       ),
-                    ),
-
-                    ElevatedButton(
-                      onPressed: widget.onClose,
-                      child: Text(
-                        'Close',
+                      label: Text(
+                        _isLikedByUser ? 'Liked' : 'Like',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white70,
+                        backgroundColor: _isLikedByUser ? Colors.green : Colors.grey,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                       ),
                     ),
-                  ])
-            ],
-          ),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  onPressed: widget.onClose,
+                  icon: Icon(Icons.close, color: Colors.white),
+                  label: Text(
+                    'Close',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
