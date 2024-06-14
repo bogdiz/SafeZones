@@ -39,6 +39,11 @@ Design patterns:
 Repo backend:
 https://github.com/crazvan6/SafeZones-backend
 
+Raportare bug + rezolvare:
+<img width="1440" alt="Screenshot 2024-06-14 at 21 59 48" src="https://github.com/bogdiz/SafeZones/assets/116109835/2c6b6a86-1f88-482b-a7a0-709f497a0204">
+<img width="1440" alt="Screenshot 2024-06-14 at 22 00 14" src="https://github.com/bogdiz/SafeZones/assets/116109835/aada54d6-3f6c-42c7-8303-032439620821">
+
+
 
 Link demo youtube:
 
