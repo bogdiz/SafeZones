@@ -1,8 +1,8 @@
 # SafeZones
 
-Welcome to SafeZones, the dedicated mobile application designed to enhance your safety and peace of mind. SafeZones helps users identify and navigate to safe spaces in their vicinity. 
+Aplicatia SafeZones are scopul de a atentiona turistii dar si rezidentii unui oras de pericolele uzuale ce pot aparea in orasul in care se afla chiar de catre martori, userii pot afirma raportul altora prin apasarea butonului de like ce va ajuta cresterea trust factorului persoanei care a raportat incidentul, trust factorul fiind vizibil in raportul persoanei, dar si ceilalti useri ce vor sti sa se fereasca temporar de acea zona, poti vedea in bara meniului toate incidentele dintr-o raza de 1km de locatia ta actuala. Aplicatia dispune de o logare rapida, fie prin crearea unui cont cu ajutorul google, fie prin adaugarea unui user si parola cu verificarea emailului.Toate aceste functionalitati pot fi utilizate in modul normal, dar si prin activarea modului dark.
 
-UML Diagrams: 
+Diagrame UML : 
 
 - [SafeZones App Classes Diagram.pdf](https://github.com/user-attachments/files/15827085/SafeZones.App-1.pdf)
 
@@ -40,4 +40,9 @@ Repo backend:
 https://github.com/crazvan6/SafeZones-backend
 
 
-Aplicatia SafeZones are scopul de a atentiona turistii dar si rezidentii unui oras de pericolele uzuale ce pot aparea in orasul in care se afla chiar de catre martori, userii pot afirma raportul altora prin apasarea butonului de like ce va ajuta cresterea trust factorului persoanei care a raportat incidentul, trust factorul fiind vizibil in raportul persoanei, dar si ceilalti useri ce vor sti sa se fereasca temporar de acea zona, poti vedea in bara meniului toate incidentele dintr-o raza de 1km de locatia ta actuala. Aplicatia dispune de o logare rapida, fie prin crearea unui cont cu ajutorul google, fie prin adaugarea unui user si parola cu verificarea emailului.Toate aceste functionalitati pot fi utilizate in modul normal, dar si prin activarea modului dark.
+Link demo youtube:
+
+https://youtu.be/t610Q-TORQc
+
+
+
